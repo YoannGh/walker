@@ -88,13 +88,13 @@ type walker struct {
 func (w *walker) walk(dirname string, fi os.FileInfo) error {
 	pathname := dirname + string(filepath.Separator) + fi.Name()
 
-	if strings.HasSuffix(pathname, "os-release") || strings.HasSuffix(pathname, "info/base-files.list") {
+	if strings.HasSuffix(pathname, "os-release") || strings.HasSuffix(pathname, "info/base-files.list") || strings.Contains(pathname, "var/lib/dpkg") {
 		fmt.Printf("walk found %s\n", pathname)
 	}
 
 	err := w.fn(pathname, fi)
 	if err == filepath.SkipDir {
-		if strings.HasSuffix(pathname, "os-release") || strings.HasSuffix(pathname, "info/base-files.list") {
+		if strings.HasSuffix(pathname, "os-release") || strings.HasSuffix(pathname, "info/base-files.list") || strings.Contains(pathname, "var/lib/dpkg") {
 			fmt.Printf("dir skipped: %s\n", pathname)
 		}
 		return nil
