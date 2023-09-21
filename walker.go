@@ -2,10 +2,12 @@ package walker
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync/atomic"
 
 	"golang.org/x/sync/errgroup"
@@ -86,11 +88,19 @@ type walker struct {
 func (w *walker) walk(dirname string, fi os.FileInfo) error {
 	pathname := dirname + string(filepath.Separator) + fi.Name()
 
+	if strings.HasSuffix(pathname, "os-release") || strings.HasSuffix(pathname, "info/base-files.list") {
+		fmt.Printf("walk found %s\n", pathname)
+	}
+
 	err := w.fn(pathname, fi)
 	if err == filepath.SkipDir {
+		if strings.HasSuffix(pathname, "os-release") || strings.HasSuffix(pathname, "info/base-files.list") {
+			fmt.Printf("dir skipped: %s\n", pathname)
+		}
 		return nil
 	}
 	if err != nil {
+		fmt.Printf("error for: %s : %s\n", pathname, err)
 		return err
 	}
 
